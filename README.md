@@ -21,7 +21,7 @@
 
 - ExeName = The name of the process you want to inject in to. Eg: Game.exe
 - DLLName = The name of the dll you want to inject. Eg: Test.dll
-- KeepOpen = If you want to keep the injector open after inject. Set to (true, 1, on) or (false, 0, off)
+- KeepOpen = If you want to keep the injector open after inject set to true if not leave it blank.
 
 ```cmd
 start injector.exe ExeName DLLName KeepOpen
@@ -31,12 +31,12 @@ start injector.exe ExeName DLLName KeepOpen
 
 - Number 1 (Normal CMD)
 ```cmd
-start injector.exe Game.exe Test.dll (true or false)
+start injector.exe Game.exe Test.dll true
 ```
 
 - Number 2 (For powershell or terminal)
 ```cmd
-start injector.exe { Game.exe Test.dll (true or false) }
+start injector.exe { Game.exe Test.dll true }
 ```
 
 <!-- Footer-->

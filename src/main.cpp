@@ -14,19 +14,16 @@ DWORD get_proc_id(const char* name) // Credit: ZeroMemoryEx
     DWORD procId = 0;
     HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
-    if (hSnap != INVALID_HANDLE_VALUE) 
-	{
+    if (hSnap != INVALID_HANDLE_VALUE) {
         PROCESSENTRY32 pE;
         pE.dwSize = sizeof(pE);
 
-        if (Process32First(hSnap, &pE)) 
-		{
+        if (Process32First(hSnap, &pE)) {
             if (!pE.th32ProcessID)
                 Process32Next(hSnap, &pE);
             do
             {
-                if (!_stricmp(pE.szExeFile, name))
-                {
+                if (!_stricmp(pE.szExeFile, name)) {
                     procId = pE.th32ProcessID;
                     break;
                 }
@@ -80,8 +77,6 @@ bool inject_dll(DWORD procID, const char* dllPath)
         CloseHandle(hProc);
         return false;
     }
-
-    return true;
 }
 
 /*		Args
@@ -93,46 +88,34 @@ bool inject_dll(DWORD procID, const char* dllPath)
 */
 int main(int count, char* args[])
 {
-	// Print args
-	// std::cout << "Arg count: " << count << std::endl;
-
-	// for (int i = 0; i < count; i++)
-	// 	std::cout << "Arg " << i << ": " << args[i] << std::endl;
-	
 	SetConsoleTitleA("Simple DLL Injector");
 
-	std::string processName = args[1];
-	std::string dllName = args[2];
-    std::string keepOpenStr = args[3];
-    bool keepOpen = false;
-        
-    if(keepOpenStr == "true" || keepOpenStr == "1" || keepOpenStr == "on")
-        keepOpen = true;
-    else if(keepOpenStr == "false" || keepOpenStr == "0" || keepOpenStr == "off")
-        keepOpen = false;
+    if(count < ARG_COUNT) {
+        std::cout << "Error, Please check arguments and try again!" << std::endl;
+        Sleep(3000);
+        return EXIT_FAILURE;
+    }
 
-	std::filesystem::path curPath = grab_current_dir() / dllName; // Set the dll path to use.
+	std::filesystem::path curPath = grab_current_dir() / args[2]; // Set the dll path to use.
 
-	std::cout << "Welcome to Simple DLL Injector" << std::endl;
-    std::cout << "Credits: Fuscina" << std::endl;
-	//std::cout << "Process Name: " << processName << std::endl;
-	//std::cout << "DLL Name: " << dllName << std::endl;
-
-	if (!std::filesystem::exists(curPath)) // Check if the dll file exists, If not close the injector.
-	{
-		std::cout << "DLL does not exist. Closing injector." << std::endl;
-		Sleep(2000);
+    // Check if the dll file exists, If not close the injector.
+	if (!std::filesystem::exists(curPath)) {
+		std::cout << "DLL does not exist. Closing injector!" << std::endl;
+		Sleep(3000);
 		return EXIT_FAILURE;
 	}
 
-    std::cout << "Looking for process: " << processName << std::endl;
+	std::cout << "Welcome to Simple DLL Injector" << std::endl;
+    std::cout << "Credits: Fuscina" << std::endl;
+    std::cout << "Looking for process: " << args[1] << std::endl;
 
+    // Find process.
     DWORD procId = 0;
     do {
-        procId = get_proc_id(processName.c_str()); // Try and grab the proccess id.
+        procId = get_proc_id(args[1]); // Try and grab the proccess id.
         Sleep(1000); // Wait 1s then retry.
     } while (procId == 0);
-
+    
 	std::cout << "Found process." << std::endl;
 
     if (!inject_dll(procId, curPath.string().c_str()))
@@ -140,8 +123,11 @@ int main(int count, char* args[])
 
     Sleep(1000);
 
-    if(keepOpen)
-	    system("pause");
+    if(args[3]) {
+        std::string arg = args[3]; // We need to save it as a string before we can check.
+        if(arg == "true")
+	        system("pause");
+    }
 
 	return EXIT_SUCCESS;
 }

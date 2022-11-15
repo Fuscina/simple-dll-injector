@@ -9,3 +9,5 @@
 #include <iomanip>
 #include <Shlwapi.h>
 #pragma comment( lib, "shlwapi.lib")
+
+#define ARG_COUNT 3
